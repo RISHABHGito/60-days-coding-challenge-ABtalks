@@ -59,3 +59,11 @@ If no resume is uploaded, ask for:
 - Target Field
 
 Then generate the resume.
+```
+
+
+                  Score
+Previous Score    48/100
+Optimized Score   87/100
+```
+
