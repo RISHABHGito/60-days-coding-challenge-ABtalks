@@ -1,0 +1,694 @@
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-50: #f0faf4;
+    --green-100: #d4f0df;
+    --green-400: #3aad6c;
+    --green-600: #1f8050;
+    --green-800: #145c38;
+    --amber-50: #fffbeb;
+    --amber-100: #fef3c7;
+    --amber-400: #f59e0b;
+    --amber-600: #b45309;
+    --blue-50: #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-400: #3b82f6;
+    --blue-600: #1d4ed8;
+    --red-50: #fef2f2;
+    --red-100: #fee2e2;
+    --red-400: #ef4444;
+    --red-600: #b91c1c;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+    --radius: 10px;
+    --radius-sm: 6px;
+    --radius-pill: 999px;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ── Layout ── */
+  .page { max-width: 1060px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  /* ── Header ── */
+  .page-header {
+    background: linear-gradient(135deg, #1a5c38 0%, #1f8050 60%, #3aad6c 100%);
+    border-radius: var(--radius);
+    padding: 2rem 2rem 1.75rem;
+    margin-bottom: 1.75rem;
+    box-shadow: var(--shadow-md);
+    color: #fff;
+  }
+  .header-eyebrow {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 0.75rem;
+  }
+  .eyebrow-tag {
+    font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    background: rgba(255,255,255,0.18); color: #fff;
+    padding: 3px 10px; border-radius: var(--radius-pill);
+  }
+  .page-header h1 {
+    font-size: 2rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: .35rem;
+  }
+  .page-header p {
+    font-size: 14px; color: rgba(255,255,255,.82); max-width: 680px; line-height: 1.65;
+  }
+
+  /* ── Metric row ── */
+  .metric-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 1.75rem;
+  }
+  .metric-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .18s, transform .18s;
+  }
+  .metric-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+  .metric-label { font-size: 12px; color: var(--gray-500); font-weight: 500; margin-bottom: 6px; }
+  .metric-value { font-size: 1.6rem; font-weight: 700; color: var(--green-800); letter-spacing: -.02em; }
+  .metric-sub { font-size: 12px; color: var(--gray-500); margin-top: 3px; }
+
+  /* ── Section card ── */
+  .section-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .section-hdr {
+    display: flex; align-items: center; gap: 9px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 13px; font-weight: 600; color: var(--gray-700);
+    background: var(--gray-50);
+  }
+  .section-hdr .hdr-icon {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .hdr-icon.green { background: var(--green-100); color: var(--green-600); }
+  .hdr-icon.amber { background: var(--amber-100); color: var(--amber-600); }
+  .hdr-icon.blue  { background: var(--blue-100);  color: var(--blue-600);  }
+  .hdr-icon.red   { background: var(--red-100);   color: var(--red-600);   }
+  .section-body { padding: 20px; }
+
+  /* ── Pipeline ── */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 10px;
+  }
+  .pipe-step {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 14px 14px 12px;
+    position: relative;
+    transition: box-shadow .18s, transform .18s;
+    background: #fff;
+  }
+  .pipe-step:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+  .pipe-step.accent { border-color: var(--green-400); background: var(--green-50); }
+  .pipe-num {
+    font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--gray-500); margin-bottom: 8px;
+  }
+  .pipe-step.accent .pipe-num { color: var(--green-600); }
+  .pipe-name {
+    font-size: 13px; font-weight: 600; color: var(--gray-800);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+  }
+  .pipe-step.accent .pipe-name { color: var(--green-800); }
+  .pipe-desc { font-size: 12px; color: var(--gray-500); line-height: 1.55; }
+  .pipe-step.accent .pipe-desc { color: var(--green-700); }
+
+  /* ── Module grid ── */
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+  }
+  .module-card {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 16px;
+    background: #fff;
+    transition: box-shadow .18s, transform .18s;
+  }
+  .module-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+  .module-icon-wrap {
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-bottom: 10px;
+  }
+  .mi-green { background: var(--green-100); }
+  .mi-amber { background: var(--amber-100); }
+  .mi-blue  { background: var(--blue-100); }
+  .module-name { font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+  .module-desc { font-size: 12px; color: var(--gray-500); line-height: 1.55; }
+
+  /* ── Tables ── */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--gray-500); padding: 0 12px 10px 0;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  td { padding: 11px 12px 11px 0; border-bottom: 1px solid var(--gray-100); vertical-align: top; line-height: 1.55; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--gray-50); }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; padding: 3px 9px;
+    border-radius: var(--radius-pill); white-space: nowrap;
+  }
+  .badge-high   { background: var(--red-50);   color: var(--red-600); }
+  .badge-medium { background: var(--amber-50);  color: var(--amber-600); }
+  .badge-low    { background: var(--green-50);  color: var(--green-600); }
+  .badge-open   { background: var(--blue-50);   color: var(--blue-600); }
+  .badge-pending { background: var(--gray-100); color: var(--gray-600); }
+
+  /* ── Schema grid ── */
+  .schema-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+  }
+  .schema-field {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    background: var(--gray-50);
+    transition: box-shadow .15s;
+  }
+  .schema-field:hover { box-shadow: var(--shadow-sm); background: #fff; }
+  .schema-key { font-size: 12px; font-family: 'Courier New', monospace; font-weight: 600; color: var(--green-800); }
+  .schema-desc { font-size: 11px; color: var(--gray-500); margin-top: 3px; }
+
+  /* ── List items ── */
+  .item-list { display: flex; flex-direction: column; gap: 8px; }
+  .item {
+    font-size: 13px; line-height: 1.6;
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    display: flex; gap: 10px; align-items: flex-start;
+    transition: box-shadow .15s;
+  }
+  .item:hover { box-shadow: var(--shadow-sm); }
+  .item-q   { background: var(--blue-50);  border-left: 3px solid var(--blue-400); }
+  .item-r   { background: var(--red-50);   border-left: 3px solid var(--red-400); }
+  .item-d   { background: var(--amber-50); border-left: 3px solid var(--amber-400); }
+  .item-icon { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+  .item-text { color: var(--gray-700); }
+
+  /* ── Scope tags ── */
+  .scope-tag {
+    display: inline-block; font-size: 11px; padding: 2px 8px;
+    border-radius: var(--radius-pill); background: var(--gray-100); color: var(--gray-600);
+    font-weight: 500;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .page-header h1 { font-size: 1.5rem; }
+    .section-body { padding: 14px; }
+    .pipeline { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 400px) {
+    .pipeline { grid-template-columns: 1fr; }
+  }
+</style>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kisaan Saathi — Project Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ── -->
+  <div class="page-header">
+    <div class="header-eyebrow">
+      <span class="eyebrow-tag">Agricultural Tech</span>
+      <span class="eyebrow-tag">MVP Phase</span>
+    </div>
+    <h1>Kisaan Saathi</h1>
+    <p>ICAR-guided, sensor-assisted, weather-aware fertilizer advisory system delivered via WhatsApp and structured LLM output.</p>
+  </div>
+
+  <!-- ── Metrics ── -->
+  <div class="metric-row">
+    <div class="metric-card">
+      <div class="metric-label">Pilot farmers</div>
+      <div class="metric-value">30–50</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Village agents</div>
+      <div class="metric-value">2–3</div>
+      <div class="metric-sub">Trained</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Pilot duration</div>
+      <div class="metric-value" style="font-size:1.25rem;padding-top:4px">One cropping season</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Primary output</div>
+      <div class="metric-value" style="font-size:1.1rem;padding-top:4px">JSON + WhatsApp</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Advisory logic</div>
+      <div class="metric-value" style="font-size:1.1rem;padding-top:4px">ICAR / STCR rules</div>
+    </div>
+  </div>
+
+  <!-- ── Summary ── -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <span class="hdr-icon green">📋</span>
+      Summary
+    </div>
+    <div class="section-body" style="font-size:14px;line-height:1.75;color:#374151;">
+      Kisaan Saathi is a rule-based agricultural advisory platform that combines live NPK/pH sensor readings, ICAR/STCR fertilizer guidelines, short-term weather forecasts, and farmer-specific application history to generate personalised fertilizer and input recommendations. A structured Claude API layer converts these computed recommendations into validated JSON and farmer-friendly WhatsApp/Hindi output, while village agents and stored records enable continuous field use and long-term soil monitoring.
+    </div>
+  </div>
+
+  <!-- ── Pipeline ── -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <span class="hdr-icon green">⚙️</span>
+      System pipeline
+    </div>
+    <div class="section-body">
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="pipe-num">Step 1</div>
+          <div class="pipe-name">📥 Input capture</div>
+          <div class="pipe-desc">Farmer ID, crop, crop stage, land size, village/location, NPK/pH sensor values, previous fertilizer/input applications.</div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">Step 2</div>
+          <div class="pipe-name">🌦️ Weather fetch</div>
+          <div class="pipe-desc">Rainfall probability, temperature, and humidity for the next few days.</div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">Step 3</div>
+          <div class="pipe-name">📐 Rule engine</div>
+          <div class="pipe-desc">Apply ICAR/STCR-based nutrient logic and crop-stage rules — fertilizer type, quantity, timing, and method.</div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">Step 4</div>
+          <div class="pipe-name">🕐 History adjustment</div>
+          <div class="pipe-desc">Check what the farmer already applied; avoid duplicate or excessive recommendations.</div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">Step 5</div>
+          <div class="pipe-name">🛡️ Risk filter</div>
+          <div class="pipe-desc">Modify or delay advice if rain or other conditions make application inefficient or unsafe.</div>
+        </div>
+        <div class="pipe-step accent">
+          <div class="pipe-num">Step 6</div>
+          <div class="pipe-name">🤖 Claude layer</div>
+          <div class="pipe-desc">Returns final advisory in a fixed JSON schema, not free text. Converts to Hindi/WhatsApp-ready blocks.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Core modules ── -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <span class="hdr-icon green">🧩</span>
+      Core modules
+    </div>
+    <div class="section-body">
+      <div class="module-grid">
+        <div class="module-card">
+          <div class="module-icon-wrap mi-green">📡</div>
+          <div class="module-name">Sensor module</div>
+          <div class="module-desc">ESP32 + NPK + pH probe capture and optional phone/Bluetooth sync.</div>
+        </div>
+        <div class="module-card">
+          <div class="module-icon-wrap mi-blue">👤</div>
+          <div class="module-name">Farmer profile module</div>
+          <div class="module-desc">Stores crop, season, location, and application history.</div>
+        </div>
+        <div class="module-card">
+          <div class="module-icon-wrap mi-green">🌾</div>
+          <div class="module-name">Advisory engine</div>
+          <div class="module-desc">Deterministic ICAR-guided rule system, not ML.</div>
+        </div>
+        <div class="module-card">
+          <div class="module-icon-wrap mi-blue">🌤️</div>
+          <div class="module-name">Weather module</div>
+          <div class="module-desc">Fetches forecast and creates simple risk flags, e.g. "avoid urea before heavy rain."</div>
+        </div>
+        <div class="module-card">
+          <div class="module-icon-wrap mi-amber">🤖</div>
+          <div class="module-name">Claude formatting layer</div>
+          <div class="module-desc">Receives computed facts and returns structured JSON in a schema-safe format.</div>
+        </div>
+        <div class="module-card">
+          <div class="module-icon-wrap mi-green">💬</div>
+          <div class="module-name">WhatsApp interface</div>
+          <div class="module-desc">Farmer or agent submits values and receives actionable guidance.</div>
+        </div>
+        <div class="module-card">
+          <div class="module-icon-wrap mi-blue">📊</div>
+          <div class="module-name">Admin / dashboard layer</div>
+          <div class="module-desc">Stores readings, farmer records, and village-level soil map over time.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Claude's role ── -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <span class="hdr-icon amber">🤖</span>
+      Claude's role — four controlled jobs
+    </div>
+    <div class="section-body">
+      <div class="item-list">
+        <div class="item item-q">
+          <span class="item-icon">1</span>
+          <span class="item-text">Validate or fill a structured response schema — Claude can be constrained to JSON schema outputs.</span>
+        </div>
+        <div class="item item-q">
+          <span class="item-icon">2</span>
+          <span class="item-text">Convert computed recommendations into human-readable explanations.</span>
+        </div>
+        <div class="item item-q">
+          <span class="item-icon">3</span>
+          <span class="item-text">Produce Hindi/English advisory text from the already-computed rule-engine result.</span>
+        </div>
+        <div class="item item-q">
+          <span class="item-icon">4</span>
+          <span class="item-text">Generate consistent WhatsApp-ready response blocks: summary, dosage, caution, next step, and follow-up date.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Output schema ── -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <span class="hdr-icon blue">{ }</span>
+      Output JSON schema fields
+    </div>
+    <div class="section-body">
+      <div class="schema-grid">
+        <div class="schema-field"><div class="schema-key">farmer_id</div><div class="schema-desc">Farmer identifier</div></div>
+        <div class="schema-field"><div class="schema-key">crop</div><div class="schema-desc">Crop name</div></div>
+        <div class="schema-field"><div class="schema-key">crop_stage</div><div class="schema-desc">Growth stage</div></div>
+        <div class="schema-field"><div class="schema-key">soil_reading</div><div class="schema-desc">NPK / pH sensor values</div></div>
+        <div class="schema-field"><div class="schema-key">weather_summary</div><div class="schema-desc">Short-term forecast</div></div>
+        <div class="schema-field"><div class="schema-key">previous_inputs</div><div class="schema-desc">Past fertilizer applications</div></div>
+        <div class="schema-field"><div class="schema-key">nutrient_status</div><div class="schema-desc">Nutrient interpretation</div></div>
+        <div class="schema-field"><div class="schema-key">recommended_fertilizer</div><div class="schema-desc">Type of fertilizer</div></div>
+        <div class="schema-field"><div class="schema-key">recommended_quantity</div><div class="schema-desc">Dose amount</div></div>
+        <div class="schema-field"><div class="schema-key">application_method</div><div class="schema-desc">How to apply</div></div>
+        <div class="schema-field"><div class="schema-key">application_time</div><div class="schema-desc">Timing guidance</div></div>
+        <div class="schema-field"><div class="schema-key">do_not_apply_if</div><div class="schema-desc">Suppression conditions</div></div>
+        <div class="schema-field"><div class="schema-key">reason</div><div class="schema-desc">Explanation of advice</div></div>
+        <div class="schema-field"><div class="schema-key">follow_up_after_days</div><div class="schema-desc">Next check interval</div></div>
+        <div class="schema-field"><div class="schema-key">voice_text_hindi</div><div class="schema-desc">Hindi WhatsApp message</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Action items ── -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <span class="hdr-icon green">✅</span>
+      Action items — MVP build
+    </div>
+    <div class="section-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40%">Task</th>
+              <th style="width:16%">Owner</th>
+              <th style="width:22%">Scope</th>
+              <th style="width:12%">Priority</th>
+              <th style="width:10%">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Build simple web admin panel for agent entry</td>
+              <td>Not specified</td>
+              <td><span class="scope-tag">MVP Frontend</span></td>
+              <td><span class="badge badge-high">🔴 High</span></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td>Build WhatsApp conversation flow for farmer output</td>
+              <td>Not specified</td>
+              <td><span class="scope-tag">MVP Frontend</span></td>
+              <td><span class="badge badge-high">🔴 High</span></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td>Implement ICAR/STCR advisory rule engine (deterministic, not ML)</td>
+              <td>Not specified</td>
+              <td><span class="scope-tag">Backend</span></td>
+              <td><span class="badge badge-high">🔴 High</span></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td>Integrate weather API with risk flag logic</td>
+              <td>Not specified</td>
+              <td><span class="scope-tag">Backend</span></td>
+              <td><span class="badge badge-high">🔴 High</span></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td>Set up Claude API call for structured JSON output</td>
+              <td>Not specified</td>
+              <td><span class="scope-tag">Backend</span></td>
+              <td><span class="badge badge-high">🔴 High</span></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td>Set up farmer database (sensor logs, application history, crop cycle state, advisories)</td>
+              <td>Not specified</td>
+              <td><span class="scope-tag">Database</span></td>
+              <td><span class="badge badge-high">🔴 High</span></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td>Integrate WhatsApp API connector</td>
+              <td>Not specified</td>
+              <td><span class="scope-tag">Backend</span></td>
+              <td><span class="badge badge-medium">🟠 Medium</span></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td>Finalise output JSON schema with all fields</td>
+              <td>Not specified</td>
+              <td><span class="scope-tag">Design</span></td>
+              <td><span class="badge badge-medium">🟠 Medium</span></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td>Recruit 30–50 pilot farmers and 2–3 trained village agents</td>
+              <td>Not specified</td>
+              <td><span class="scope-tag">Field Ops</span></td>
+              <td><span class="badge badge-medium">🟠 Medium</span></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td>Train village agents on system use</td>
+              <td>Not specified</td>
+              <td><span class="scope-tag">Field Ops</span></td>
+              <td><span class="badge badge-medium">🟠 Medium</span></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td>Build admin / dashboard layer for soil map and farmer records</td>
+              <td>Not specified</td>
+              <td><span class="scope-tag">Frontend</span></td>
+              <td><span class="badge badge-low">🟢 Low</span></td>
+              <td><span class="badge badge-pending">⏳ Pending</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Decision logic ── -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <span class="hdr-icon amber">⚖️</span>
+      Decision logic — history-aware &amp; weather-aware checks
+    </div>
+    <div class="section-body">
+      <div class="item-list">
+        <div class="item item-d">
+          <span class="item-icon">🔁</span>
+          <span class="item-text">Same fertilizer already applied recently — avoid duplicate recommendation.</span>
+        </div>
+        <div class="item item-d">
+          <span class="item-icon">⏱️</span>
+          <span class="item-text">Maximum safe interval not completed — suppress or delay.</span>
+        </div>
+        <div class="item item-d">
+          <span class="item-icon">⚠️</span>
+          <span class="item-text">Repeated nitrogen recommendation within too short a window — blocked.</span>
+        </div>
+        <div class="item item-d">
+          <span class="item-icon">🚫</span>
+          <span class="item-text">Incompatible combination risk — flagged before delivery.</span>
+        </div>
+        <div class="item item-d">
+          <span class="item-icon">🌧️</span>
+          <span class="item-text">Weather-aware suppression: delay application before forecast heavy rain (e.g. urea wash-off risk).</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Open questions ── -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <span class="hdr-icon blue">❓</span>
+      Open questions
+    </div>
+    <div class="section-body">
+      <div class="item-list">
+        <div class="item item-q">
+          <span class="item-icon">❓</span>
+          <span class="item-text">Which weather API will be integrated for forecast data and risk flag generation?</span>
+        </div>
+        <div class="item item-q">
+          <span class="item-icon">❓</span>
+          <span class="item-text">Which WhatsApp API provider will be used (e.g. Twilio, Meta Business API)?</span>
+        </div>
+        <div class="item item-q">
+          <span class="item-icon">❓</span>
+          <span class="item-text">Who are the named owners for each module build?</span>
+        </div>
+        <div class="item item-q">
+          <span class="item-icon">❓</span>
+          <span class="item-text">Which crops and crop stages will be included in the MVP rule engine?</span>
+        </div>
+        <div class="item item-q">
+          <span class="item-icon">❓</span>
+          <span class="item-text">Will the ESP32 sensor sync via Bluetooth to a phone app, or directly to the backend?</span>
+        </div>
+        <div class="item item-q">
+          <span class="item-icon">❓</span>
+          <span class="item-text">Is the backend stack confirmed as Node.js or Python?</span>
+        </div>
+        <div class="item item-q">
+          <span class="item-icon">❓</span>
+          <span class="item-text">Which pilot region or village has been selected for the first cropping season?</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Risks & blockers ── -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <span class="hdr-icon red">⚠️</span>
+      Risks &amp; blockers
+    </div>
+    <div class="section-body">
+      <div class="item-list">
+        <div class="item item-r">
+          <span class="item-icon">⚠️</span>
+          <span class="item-text">ICAR/STCR rule encoding requires agronomic domain expertise — no ML fallback if rules are incomplete or a crop is not covered.</span>
+        </div>
+        <div class="item item-r">
+          <span class="item-icon">⚠️</span>
+          <span class="item-text">Weather API reliability in rural or low-connectivity areas may degrade forecast accuracy.</span>
+        </div>
+        <div class="item item-r">
+          <span class="item-icon">⚠️</span>
+          <span class="item-text">WhatsApp API access requires Meta Business approval and compliance — approval timeline is not specified.</span>
+        </div>
+        <div class="item item-r">
+          <span class="item-icon">⚠️</span>
+          <span class="item-text">Sensor hardware (ESP32 + NPK + pH probe) in the field faces durability, calibration, and connectivity challenges.</span>
+        </div>
+        <div class="item item-r">
+          <span class="item-icon">⚠️</span>
+          <span class="item-text">Hindi voice text quality and local dialect accuracy not validated yet.</span>
+        </div>
+        <div class="item item-r">
+          <span class="item-icon">⚠️</span>
+          <span class="item-text">Village agent training and sustained engagement are critical — dropout risk during pilot.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Key design constraints ── -->
+  <div class="section-card">
+    <div class="section-hdr">
+      <span class="hdr-icon amber">🔒</span>
+      Key design constraints
+    </div>
+    <div class="section-body">
+      <div class="item-list">
+        <div class="item item-d">
+          <span class="item-icon">🔒</span>
+          <span class="item-text">Agronomy logic must stay outside the LLM — Claude is a formatting and translation layer only, not a recommendation engine.</span>
+        </div>
+        <div class="item item-d">
+          <span class="item-icon">🔒</span>
+          <span class="item-text">Rule-based first, LLM-assisted second — hallucination risk means no free-text fertilizer recommendations from Claude.</span>
+        </div>
+        <div class="item item-d">
+          <span class="item-icon">🔒</span>
+          <span class="item-text">History-aware checks must prevent duplicate nitrogen/urea recommendations within unsafe intervals — enforced in the rule engine, not assumed.</span>
+        </div>
+        <div class="item item-d">
+          <span class="item-icon">🔒</span>
+          <span class="item-text">System must be auditable — deterministic rules keep the advisory traceable and verifiable by agronomists.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
