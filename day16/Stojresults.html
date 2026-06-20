@@ -1,1 +1,316 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Major Insights Difference Chart — Tesla vs Adani Enterprises</title>
+<style>
+  :root {
+    --ink: #1b1b1b;
+    --paper: #fbfaf7;
+    --line: #d8d4cb;
+    --tesla: #c8102e;
+    --adani: #e08600;
+    --diff: #2b6e4f;
+    --focus: #1d6fd6;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 2.5rem 1.25rem 4rem;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    margin: 0 0 2rem;
+    color: #5a5650;
+    font-size: 0.95rem;
+  }
+
+  .legend {
+    display: flex;
+    gap: 1.25rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .swatch {
+    width: 0.85rem;
+    height: 0.85rem;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  .swatch.tesla { background: var(--tesla); }
+  .swatch.adani { background: var(--adani); }
+
+  figure {
+    margin: 0 0 1rem;
+    padding: 1.25rem 1.25rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+  }
+
+  .chart {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    align-items: flex-end;
+    height: 220px;
+    padding: 0 0.25rem;
+  }
+
+  .metric-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+  }
+
+  .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .bar {
+    width: 28px;
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    transition: height 0.5s ease;
+    min-height: 2px;
+  }
+
+  .bar.tesla { background: var(--tesla); }
+  .bar.adani { background: var(--adani); }
+
+  .bar:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .bar-value {
+    position: absolute;
+    top: -1.3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .metric-label {
+    margin-top: 0.6rem;
+    font-size: 0.78rem;
+    text-align: center;
+    color: #444;
+  }
+
+  .diff-pill {
+    margin-top: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--diff);
+    background: #e7f3ec;
+    border-radius: 999px;
+    padding: 0.1rem 0.5rem;
+    white-space: nowrap;
+  }
+
+  figcaption {
+    font-size: 0.85rem;
+    color: #5a5650;
+    border-top: 1px solid var(--line);
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+    font-size: 0.85rem;
+  }
+
+  caption {
+    text-align: left;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  th, td {
+    border: 1px solid var(--line);
+    padding: 0.5rem 0.65rem;
+    text-align: right;
+  }
+
+  th[scope="row"], td:first-child, th:first-child {
+    text-align: left;
+  }
+
+  thead th {
+    background: #f1efe8;
+  }
+
+  .source-note {
+    font-size: 0.78rem;
+    color: #7a766e;
+    margin-top: 0.75rem;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Major Insights Difference Chart</h1>
+  <p class="subtitle">
+    Comparing three fundamental metrics for Tesla (TSLA) and Adani Enterprises (ADANIENT),
+    and the difference between them.
+  </p>
+
+  <div class="legend">
+    <span><span class="swatch tesla" aria-hidden="true"></span> Tesla</span>
+    <span><span class="swatch adani" aria-hidden="true"></span> Adani Enterprises</span>
+    <span><span class="swatch" style="background:var(--diff)" aria-hidden="true"></span> Difference (pp)</span>
+  </div>
+
+  <figure id="chart-figure" aria-labelledby="chart-caption">
+    <div class="chart" id="chart" role="img"
+         aria-label="Grouped bar chart. Return on equity: Tesla 4.9 percent, Adani Enterprises 9.82 percent, difference 4.92 percentage points. Return on capital employed: Tesla 4.38 percent, Adani Enterprises 9.45 percent, difference 5.07 percentage points. Net profit margin: Tesla 3.95 percent, Adani Enterprises 14.88 percent, difference 10.93 percentage points. Adani Enterprises leads on all three metrics.">
+      <!-- Bars are built by JavaScript from the data array below -->
+    </div>
+    <noscript>
+      <p>JavaScript is disabled — see the data table below for the same figures.</p>
+    </noscript>
+    <figcaption id="chart-caption">
+      <strong>Insights</strong> = the three fundamental ratios compared (ROE, ROCE, net profit margin).
+      <strong>Difference</strong> = Adani Enterprises value minus Tesla value, in percentage points (pp).
+      A positive difference means Adani Enterprises is higher on that metric.
+    </figcaption>
+  </figure>
+
+  <table>
+    <caption>Underlying data (percent)</caption>
+    <thead>
+      <tr>
+        <th scope="col">Metric</th>
+        <th scope="col">Tesla</th>
+        <th scope="col">Adani Enterprises</th>
+        <th scope="col">Difference (pp)</th>
+      </tr>
+    </thead>
+    <tbody id="data-table-body">
+      <!-- Rows are built by JavaScript from the same data array -->
+    </tbody>
+  </table>
+
+  <p class="source-note">
+    Figures are illustrative snapshot values (ROE/ROCE: trailing; net margin: trailing twelve months) and will date quickly —
+    verify current numbers before relying on them. Not investment advice.
+  </p>
+</main>
+
+<script>
+  // Single source of truth for the whole page: chart + table are both rendered from this array.
+  const data = [
+    { label: "Return on Equity",      tesla: 4.90,  adani: 9.82  },
+    { label: "Return on Capital Employed", tesla: 4.38, adani: 9.45 },
+    { label: "Net Profit Margin",     tesla: 3.95,  adani: 14.88 }
+  ];
+
+  const maxValue = Math.max(...data.flatMap(d => [d.tesla, d.adani]));
+  const chartHeightPx = 170; // leaves room for the value label above each bar
+
+  function heightFor(value) {
+    return Math.max((value / maxValue) * chartHeightPx, 2);
+  }
+
+  const chartEl = document.getElementById("chart");
+  const tableBody = document.getElementById("data-table-body");
+
+  data.forEach(d => {
+    const diff = +(d.adani - d.tesla).toFixed(2);
+
+    // --- Chart bars ---
+    const group = document.createElement("div");
+    group.className = "metric-group";
+
+    const bars = document.createElement("div");
+    bars.className = "bars";
+
+    const teslaBar = document.createElement("div");
+    teslaBar.className = "bar tesla";
+    teslaBar.style.height = heightFor(d.tesla) + "px";
+    teslaBar.tabIndex = 0;
+    teslaBar.setAttribute("aria-label", `Tesla, ${d.label}: ${d.tesla}%`);
+    const teslaVal = document.createElement("span");
+    teslaVal.className = "bar-value";
+    teslaVal.textContent = d.tesla + "%";
+    teslaVal.setAttribute("aria-hidden", "true");
+    teslaBar.appendChild(teslaVal);
+
+    const adaniBar = document.createElement("div");
+    adaniBar.className = "bar adani";
+    adaniBar.style.height = heightFor(d.adani) + "px";
+    adaniBar.tabIndex = 0;
+    adaniBar.setAttribute("aria-label", `Adani Enterprises, ${d.label}: ${d.adani}%`);
+    const adaniVal = document.createElement("span");
+    adaniVal.className = "bar-value";
+    adaniVal.textContent = d.adani + "%";
+    adaniVal.setAttribute("aria-hidden", "true");
+    adaniBar.appendChild(adaniVal);
+
+    bars.append(teslaBar, adaniBar);
+
+    const label = document.createElement("div");
+    label.className = "metric-label";
+    label.textContent = d.label;
+
+    const pill = document.createElement("div");
+    pill.className = "diff-pill";
+    pill.textContent = (diff >= 0 ? "+" : "") + diff + " pp";
+
+    group.append(bars, label, pill);
+    chartEl.appendChild(group);
+
+    // --- Table row (accessible data backup, kept in sync with the chart) ---
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <th scope="row">${d.label}</th>
+      <td>${d.tesla}%</td>
+      <td>${d.adani}%</td>
+      <td>${diff >= 0 ? "+" : ""}${diff}</td>
+    `;
+    tableBody.appendChild(row);
+  });
+</script>
+</body>
+</html>
