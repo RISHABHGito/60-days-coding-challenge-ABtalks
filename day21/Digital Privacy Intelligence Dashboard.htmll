@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Digital Footprint & Privacy Dashboard (demo)</title>
+  <style>
+  :root{
+    --bg:#F6F7FA;
+    --surface:#FFFFFF;
+    --surface-sunken:#FBFBFD;
+    --border:#E4E7EC;
+    --border-strong:#D2D6DD;
+    --text:#1A1F36;
+    --text-secondary:#5B6172;
+    --text-tertiary:#8A8F9C;
+    --accent:#4F5DE0;
+    --accent-soft:#EEF0FD;
+    --accent-strong:#3B46B8;
+    --green:#1E9E5A;
+    --green-soft:#E6F6ED;
+    --yellow:#C99A00;
+    --yellow-soft:#FFF6DD;
+    --orange:#D2691E;
+    --orange-soft:#FFEEE0;
+    --red:#D6395B;
+    --red-soft:#FCE7EC;
+    --track:#EDEFF3;
+    --radius-sm:8px;
+    --radius-md:12px;
+    --radius-lg:16px;
+    --shadow-card:0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06);
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--sans);
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; animation:none !important;}
+  }
+  a{color:var(--accent);}
+  .app{max-width:1180px;margin:0 auto;padding:32px 20px 90px;}
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    gap:20px;flex-wrap:wrap;margin-bottom:22px;
+  }
+  .brand h1{font-size:1.5rem;margin:0 0 4px;letter-spacing:-0.01em;}
+  .brand p{margin:0;color:var(--text-secondary);font-size:.92rem;max-width:560px;}
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .pill-toggle{
+    display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);
+    border-radius:999px;padding:4px;gap:2px;box-shadow:var(--shadow-card);
+  }
+  .pill-toggle button{
+    border:none;background:transparent;padding:7px 14px;border-radius:999px;font-size:.82rem;
+    font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:var(--sans);
+  }
+  .pill-toggle button.active{background:var(--accent);color:#fff;}
+  .btn{
+    border:1px solid var(--border-strong);background:var(--surface);color:var(--text);
+    padding:8px 14px;border-radius:var(--radius-sm);font-size:.82rem;font-weight:600;
+    cursor:pointer;font-family:var(--sans);box-shadow:var(--shadow-card);
+  }
+  .btn:hover{border-color:var(--accent);color:var(--accent-strong);}
+  .btn:focus-visible, button:focus-visible, input:focus-visible{
+    outline:2px solid var(--accent);outline-offset:2px;
+  }
+  .btn-sm{padding:5px 10px;font-size:.74rem;border-radius:7px;}
+
+  /* ---------- Cards ---------- */
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+    padding:22px 24px;box-shadow:var(--shadow-card);margin-bottom:22px;
+  }
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+  .eyebrow{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-tertiary);font-weight:700;margin:0 0 4px;}
+  .card h2{font-size:1.05rem;margin:0;letter-spacing:-0.005em;}
+  .card .desc{color:var(--text-secondary);font-size:.86rem;margin:4px 0 0;max-width:680px;}
+
+  .badge{
+    display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-weight:700;
+    padding:3px 8px;border-radius:999px;letter-spacing:.02em;white-space:nowrap;
+  }
+  .badge-fact{background:var(--green-soft);color:var(--green);}
+  .badge-estimate{background:var(--orange-soft);color:#9A5B00;}
+  .badge-neutral{background:var(--accent-soft);color:var(--accent-strong);}
+
+  /* ---------- Instruction panel ---------- */
+  .instructions ul{margin:8px 0 0;padding-left:18px;color:var(--text-secondary);font-size:.86rem;}
+  .instructions li{margin-bottom:6px;}
+  .legend-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;}
+  .legend-chip{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--text-secondary);}
+
+  /* ---------- Scores ---------- */
+  .grid-scores{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  .score-card{display:flex;gap:20px;align-items:center;}
+  .gauge-wrap{position:relative;width:140px;height:140px;flex:0 0 auto;}
+  .gauge-wrap svg{width:140px;height:140px;}
+  .gauge-center{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  }
+  .gauge-center .num{font-family:var(--mono);font-size:1.9rem;font-weight:700;line-height:1;}
+  .gauge-center .max{font-size:.7rem;color:var(--text-tertiary);}
+  .score-details{flex:1;min-width:0;}
+  .score-bracket{display:flex;align-items:center;gap:8px;font-weight:700;font-size:1rem;margin-bottom:4px;}
+  .score-details p{margin:6px 0 0;font-size:.82rem;color:var(--text-secondary);}
+  .factor-list{margin:10px 0 0;padding:0;list-style:none;font-size:.78rem;color:var(--text-secondary);}
+  .factor-list li{display:flex;justify-content:space-between;border-top:1px dashed var(--border);padding:5px 0;}
+  .factor-list li span:last-child{font-family:var(--mono);color:var(--text);}
+
+  /* ---------- Heatmap ---------- */
+  .heatmap-scroll{overflow-x:auto;padding-bottom:4px;}
+  .heatmap-grid{display:grid;border-collapse:collapse;min-width:760px;}
+  .hm-cell{
+    border:1px solid var(--border);padding:8px 4px;text-align:center;font-size:.72rem;
+    font-family:var(--mono);color:var(--text);min-width:50px;
+  }
+  .hm-row-label{
+    border:1px solid var(--border);padding:8px 10px;font-size:.78rem;font-weight:600;
+    background:var(--surface-sunken);text-align:left;white-space:nowrap;position:sticky;left:0;
+  }
+  .hm-col-label{
+    border:1px solid var(--border);padding:6px 4px;font-size:.66rem;font-weight:700;
+    background:var(--surface-sunken);text-align:center;color:var(--text-secondary);writing-mode:vertical-rl;text-orientation:mixed;min-width:50px;
+  }
+  .hm-corner{border:1px solid var(--border);background:var(--surface-sunken);position:sticky;left:0;}
+
+  /* ---------- Ranking ---------- */
+  .rank-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--border);}
+  .rank-row:first-child{border-top:none;}
+  .rank-check{flex:0 0 auto;width:16px;height:16px;}
+  .rank-name{flex:0 0 150px;font-weight:700;font-size:.86rem;}
+  .rank-bar-wrap{flex:1;min-width:0;}
+  .rank-bar-track{background:var(--track);border-radius:6px;height:10px;overflow:hidden;}
+  .rank-bar-fill{height:100%;border-radius:6px;background:var(--accent);}
+  .rank-meta{flex:0 0 auto;font-family:var(--mono);font-size:.78rem;color:var(--text-secondary);width:108px;text-align:right;}
+
+  /* ---------- Matrix ---------- */
+  .matrix-scroll{overflow-x:auto;}
+  table.matrix{border-collapse:collapse;width:100%;min-width:920px;font-size:.78rem;}
+  table.matrix th, table.matrix td{border:1px solid var(--border);padding:7px 8px;text-align:center;}
+  table.matrix th{background:var(--surface-sunken);font-size:.68rem;text-transform:uppercase;letter-spacing:.03em;color:var(--text-secondary);position:sticky;top:0;}
+  table.matrix td.name-cell, table.matrix th.name-cell{text-align:left;white-space:nowrap;}
+  table.matrix tr.inactive td{opacity:.35;}
+  .tick{color:var(--accent);font-weight:700;}
+  .parent-tag{font-size:.68rem;color:var(--text-tertiary);}
+
+  /* ---------- Radar ---------- */
+  .radar-wrap{display:flex;gap:24px;flex-wrap:wrap;align-items:center;justify-content:center;}
+  .radar-svg{width:320px;height:320px;flex:0 0 auto;}
+  .radar-legend{flex:1;min-width:220px;}
+  .radar-legend-row{display:flex;justify-content:space-between;font-size:.8rem;padding:6px 0;border-top:1px solid var(--border);}
+  .radar-legend-row:first-child{border-top:none;}
+  .radar-legend-row span:last-child{font-family:var(--mono);font-weight:700;}
+
+  /* ---------- Twin / Assets / Plan lists ---------- */
+  .twin-list{list-style:none;margin:0;padding:0;}
+  .twin-list li{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--border);font-size:.86rem;}
+  .twin-list li:first-child{border-top:none;}
+  .twin-bullet{flex:0 0 auto;color:var(--accent);}
+
+  .asset-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--border);}
+  .asset-row:first-child{border-top:none;}
+  .asset-rank{flex:0 0 24px;font-family:var(--mono);font-weight:700;color:var(--text-tertiary);}
+  .asset-main{flex:1;min-width:0;}
+  .asset-title{font-weight:700;font-size:.88rem;display:flex;align-items:center;gap:8px;}
+  .asset-bar-track{background:var(--track);border-radius:6px;height:6px;margin:6px 0;overflow:hidden;}
+  .asset-bar-fill{height:100%;background:var(--orange);border-radius:6px;}
+  .asset-desc{font-size:.78rem;color:var(--text-secondary);}
+
+  .plan-row{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--border);align-items:flex-start;}
+  .plan-row:first-child{border-top:none;}
+  .plan-status{flex:0 0 22px;font-size:1rem;line-height:1.6;}
+  .plan-main{flex:1;min-width:0;}
+  .plan-title{font-weight:700;font-size:.88rem;}
+  .plan-desc{font-size:.8rem;color:var(--text-secondary);margin-top:2px;}
+  .plan-impact{font-family:var(--mono);font-size:.76rem;color:var(--accent-strong);white-space:nowrap;flex:0 0 auto;font-weight:700;}
+
+  /* ---------- Simulator ---------- */
+  .sim-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .sim-action{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--border);}
+  .sim-action:first-child{border-top:none;}
+  .sim-action input{margin-top:3px;flex:0 0 auto;width:16px;height:16px;}
+  .sim-action label{font-size:.82rem;font-weight:600;cursor:pointer;}
+  .sim-action .sub{display:block;font-size:.74rem;color:var(--text-secondary);font-weight:400;margin-top:2px;}
+  .sim-readout{
+    background:var(--surface-sunken);border:1px solid var(--border);border-radius:var(--radius-md);
+    padding:14px 16px;font-size:.82rem;color:var(--text-secondary);margin-top:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  }
+  .sim-readout b{color:var(--text);font-family:var(--mono);}
+  .quick-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+
+  /* ---------- Verdict ---------- */
+  .verdict-text{font-size:.95rem;line-height:1.65;margin:0;}
+  .verdict-chips{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .verdict-chip{display:flex;align-items:center;gap:6px;background:var(--surface-sunken);border:1px solid var(--border);border-radius:999px;padding:6px 12px;font-size:.8rem;font-weight:700;}
+  .verdict-footnote{font-size:.76rem;color:var(--text-tertiary);margin-top:12px;font-style:italic;}
+
+  /* ---------- Totals ---------- */
+  .grid-totals{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow-card);}
+  .stat-card .eyebrow{margin-bottom:8px;}
+  .stat-card .stat-num{font-family:var(--mono);font-size:1.7rem;font-weight:700;}
+  .stat-card .stat-sub{font-size:.76rem;color:var(--text-secondary);margin-top:4px;}
+
+  .placeholder-note{
+    background:var(--surface-sunken);border:1px dashed var(--border-strong);border-radius:var(--radius-md);
+    padding:18px;text-align:center;color:var(--text-tertiary);font-size:.85rem;font-style:italic;
+  }
+
+  footer.disclaimer{
+    margin-top:30px;padding-top:18px;border-top:1px solid var(--border);
+    font-size:.74rem;color:var(--text-tertiary);line-height:1.6;
+  }
+
+  @media (max-width:760px){
+    .grid-scores{grid-template-columns:1fr;}
+    .sim-grid{grid-template-columns:1fr;}
+    .grid-totals{grid-template-columns:1fr 1fr;}
+    .score-card{flex-direction:column;align-items:flex-start;}
+    .rank-name{flex-basis:100px;}
+  }
+  @media (max-width:480px){
+    .grid-totals{grid-template-columns:1fr;}
+  }
+</style>
+
+<div class="app" id="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <h1>Digital Footprint &amp; Privacy Dashboard</h1>
+      <p>An illustrative, fully client-side analysis of a sample set of digital services. Service names and categories are treated as facts; everything else — parent companies, data-type coverage, scores, and the simulated profile — is a deterministic estimate for demonstration purposes only.</p>
+    </div>
+    <div class="controls">
+      <div class="pill-toggle" role="group" aria-label="Facts or estimates view">
+        <button id="viewAllBtn" class="active" type="button">Facts + Estimates</button>
+        <button id="viewFactsBtn" type="button">Facts only</button>
+      </div>
+      <button class="btn" id="resetBtn" type="button">Reset simulator</button>
+    </div>
+  </div>
+
+  <div class="card instructions">
+    <p class="eyebrow">How to read this dashboard</p>
+    <h2>Instructions</h2>
+    <ul>
+      <li><strong>Facts vs. Estimates:</strong> Every figure carries a <span class="badge badge-fact">FACT</span> or <span class="badge badge-estimate">ESTIMATE</span> tag. Facts come straight from the service list below. Estimates are derived, inferred, or modeled — use the toggle above to hide estimates entirely.</li>
+      <li><strong>Scores (0–100):</strong> Higher Footprint Score = more estimated exposure. Higher Privacy Score = stronger estimated protection. See the legends on each gauge.</li>
+      <li><strong>Heatmap &amp; Matrix colors:</strong> Darker cells indicate more active services estimated to collect that data type.</li>
+      <li><strong>Simulator:</strong> Toggle services off in the Data Collection Matrix or Company Ranking, and check protective actions in the Simulator, to see every section recalculate live.</li>
+      <li>No real personal, behavioral, or private data is accessed. All numbers are generated from the sample dataset using fixed, transparent rules — not certainty claims about any individual.</li>
+    </ul>
+    <div class="legend-row">
+      <span class="legend-chip">🟢 Minimal / Strong</span>
+      <span class="legend-chip">🟡 Moderate / Good</span>
+      <span class="legend-chip">🟠 Significant / Fair</span>
+      <span class="legend-chip">🔴 Extensive / Weak</span>
+    </div>
+  </div>
+
+  <!-- 1 & 2: Scores -->
+  <div class="grid-scores">
+    <div class="card score-card" id="footprintCard"></div>
+    <div class="card score-card" id="privacyCard"></div>
+  </div>
+
+  <!-- 3: Heatmap -->
+  <div class="card" id="heatmapSection"></div>
+
+  <!-- 4: Company Exposure Ranking -->
+  <div class="card" id="rankingSection"></div>
+
+  <!-- 5: Data Collection Matrix -->
+  <div class="card" id="matrixSection"></div>
+
+  <!-- 6: Risk Radar -->
+  <div class="card" id="radarSection"></div>
+
+  <!-- 7: Digital Twin Profile -->
+  <div class="card" id="twinSection"></div>
+
+  <!-- 8: Most Valuable Data Assets -->
+  <div class="card" id="assetsSection"></div>
+
+  <!-- 9: Privacy Improvement Plan -->
+  <div class="card" id="planSection"></div>
+
+  <!-- 10: Simulator -->
+  <div class="card" id="simulatorSection"></div>
+
+  <!-- 11: Final Verdict -->
+  <div class="card" id="verdictSection"></div>
+
+  <!-- 12: Totals -->
+  <div class="grid-totals" id="totalsSection"></div>
+
+  <footer class="disclaimer">
+    Sample dataset for demonstration only. Service names reflect publicly known, commonly used digital products; parent-company mappings, collected data types, sensitivity weightings, and all scores are simplified, deterministic estimates built for this dashboard and do not represent verified records, real surveillance data, or claims about any specific individual. Visual language inspired by familiar dashboard and privacy-checkup conventions.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ===================== DATA ===================== */
+
+  var DATA_TYPES = [
+    {key:'location', label:'Location', short:'Loc', weight:4},
+    {key:'contacts', label:'Contacts', short:'Cnt', weight:2},
+    {key:'browsing', label:'Browsing History', short:'Brw', weight:3},
+    {key:'search', label:'Search Queries', short:'Srch', weight:3},
+    {key:'purchase', label:'Purchase History', short:'Pur', weight:3},
+    {key:'financial', label:'Financial Data', short:'Fin', weight:5},
+    {key:'biometric', label:'Biometric', short:'Bio', weight:5},
+    {key:'social', label:'Social Graph', short:'Soc', weight:3},
+    {key:'health', label:'Health Data', short:'Hlth', weight:5},
+    {key:'device', label:'Device Info', short:'Dev', weight:2},
+    {key:'voice', label:'Voice / Audio', short:'Voi', weight:4},
+    {key:'media', label:'Photos & Media', short:'Med', weight:3},
+    {key:'adprofile', label:'Behavioral / Ad Profile', short:'Ad', weight:3},
+    {key:'comms', label:'Communications Content', short:'Com', weight:4}
+  ];
+  var DT_BY_KEY = {};
+  DATA_TYPES.forEach(function(d){ DT_BY_KEY[d.key] = d; });
+
+  var ASSET_DESC = {
+    location:'Combines movement and timing patterns — high value for ad targeting and habit prediction.',
+    contacts:'Maps your personal and professional network beyond the account holder.',
+    browsing:'Reveals interests and intent across sessions and sites.',
+    search:'Reveals explicit, in-the-moment intent and concerns.',
+    purchase:'Indicates lifestyle, approximate income, and recurring needs.',
+    financial:'Directly tied to spending capacity — high resale value to brokers and advertisers.',
+    biometric:'Unique and effectively unchangeable — high long-term re-identification value.',
+    social:'Maps relationships and influence for network-based targeting.',
+    health:'Reveals medical and wellness conditions — sensitive and often regulated.',
+    device:'Low sensitivity alone, but a strong cross-service identifier when combined.',
+    voice:'Audio captured by voice assistants, sometimes including ambient sound.',
+    media:'Photos and clips may carry metadata — location, time, faces — beyond the image.',
+    adprofile:'Aggregated behavioral signal used directly for ad personalization and look-alikes.',
+    comms:'Message or email content — high sensitivity if ever accessed or breached.'
+  };
+
+  var SERVICES = [
+    {id:'gsearch', name:'Google Search', parent:'Alphabet (Google)', category:'Search & Browsing', types:['search','browsing','device','adprofile','location']},
+    {id:'gmail', name:'Gmail', parent:'Alphabet (Google)', category:'Email', types:['comms','contacts','adprofile']},
+    {id:'youtube', name:'YouTube', parent:'Alphabet (Google)', category:'Streaming & Media', types:['browsing','search','adprofile','device']},
+    {id:'gmaps', name:'Google Maps', parent:'Alphabet (Google)', category:'Maps & Navigation', types:['location','search','device']},
+    {id:'android', name:'Android OS', parent:'Alphabet (Google)', category:'Operating System', types:['device','location','contacts','adprofile']},
+    {id:'chrome', name:'Chrome Browser', parent:'Alphabet (Google)', category:'Search & Browsing', types:['browsing','device','adprofile']},
+    {id:'gpay', name:'Google Pay', parent:'Alphabet (Google)', category:'Finance', types:['financial','purchase','device']},
+    {id:'fitbit', name:'Fitbit', parent:'Alphabet (Google)', category:'Health & Fitness', types:['health','biometric','location','device']},
+    {id:'instagram', name:'Instagram', parent:'Meta', category:'Social Media', types:['social','media','adprofile','location']},
+    {id:'facebook', name:'Facebook', parent:'Meta', category:'Social Media', types:['social','adprofile','comms','location']},
+    {id:'whatsapp', name:'WhatsApp', parent:'Meta', category:'Messaging', types:['contacts','comms','device']},
+    {id:'messenger', name:'Messenger', parent:'Meta', category:'Messaging', types:['comms','contacts','social']},
+    {id:'amazon', name:'Amazon Shopping', parent:'Amazon', category:'Shopping', types:['purchase','financial','device','adprofile']},
+    {id:'primevideo', name:'Prime Video', parent:'Amazon', category:'Streaming & Media', types:['browsing','adprofile']},
+    {id:'alexa', name:'Alexa', parent:'Amazon', category:'Smart Home / IoT', types:['voice','device','location']},
+    {id:'kindle', name:'Kindle', parent:'Amazon', category:'Streaming & Media', types:['purchase','adprofile']},
+    {id:'iphone', name:'iPhone (iOS)', parent:'Apple', category:'Operating System', types:['device','location','biometric','media']},
+    {id:'icloud', name:'iCloud', parent:'Apple', category:'Productivity & Cloud', types:['media','contacts','device']},
+    {id:'applepay', name:'Apple Pay', parent:'Apple', category:'Finance', types:['financial','purchase','biometric']},
+    {id:'outlook', name:'Outlook', parent:'Microsoft', category:'Email', types:['comms','contacts']},
+    {id:'m365', name:'Microsoft 365', parent:'Microsoft', category:'Productivity & Cloud', types:['comms','device']},
+    {id:'linkedin', name:'LinkedIn', parent:'Microsoft', category:'Social Media', types:['social','adprofile','device']},
+    {id:'tiktok', name:'TikTok', parent:'ByteDance', category:'Social Media', types:['adprofile','browsing','device','location']},
+    {id:'xcorp', name:'X (Twitter)', parent:'X Corp', category:'Social Media', types:['social','adprofile','comms']},
+    {id:'netflix', name:'Netflix', parent:'Netflix, Inc.', category:'Streaming & Media', types:['browsing','adprofile','purchase']},
+    {id:'spotify', name:'Spotify', parent:'Spotify Technology', category:'Streaming & Media', types:['browsing','adprofile','location']},
+    {id:'paypal', name:'PayPal', parent:'PayPal Holdings', category:'Finance', types:['financial','purchase']}
+  ];
+
+  var CATEGORIES = [];
+  SERVICES.forEach(function(s){ if(CATEGORIES.indexOf(s.category)===-1) CATEGORIES.push(s.category); });
+
+  var RADAR_AXES = [
+    {label:'Location Tracking', types:['location']},
+    {label:'Behavioral Profiling', types:['adprofile','search','browsing']},
+    {label:'Financial Exposure', types:['financial','purchase']},
+    {label:'Biometric & Health', types:['biometric','health']},
+    {label:'Social & Comms', types:['social','comms','contacts']},
+    {label:'Device & Media', types:['device','media','voice']}
+  ];
+
+  var PROTECTIVE_ACTIONS = [
+    {key:'twofa', label:'Enable two-factor authentication everywhere', points:8, footprintDelta:0, desc:'Adds a second verification step, limiting the impact of any single leaked password.'},
+    {key:'adsOff', label:'Turn off ad personalization in account settings', points:6, footprintDelta:-4, desc:'Limits cross-service behavioral profiling used to power targeted ads.'},
+    {key:'revokePerms', label:'Revoke unused third-party app & OAuth permissions', points:5, footprintDelta:-2, desc:'Shrinks the number of external apps able to read your account data.'},
+    {key:'blockCookies', label:'Block third-party cookies / use a tracker-blocking browser', points:7, footprintDelta:-6, desc:'Reduces cross-site tracking linked to browsing history.'},
+    {key:'locationOff', label:'Turn off background location history', points:6, footprintDelta:-5, desc:'Stops continuous location logging by apps and OS-level services.'},
+    {key:'passwordMgr', label:'Use a password manager with unique passwords', points:4, footprintDelta:0, desc:'Limits the blast radius of any one credential leak.'},
+    {key:'dataBrokerOptout', label:'Submit opt-out requests to major data brokers', points:5, footprintDelta:-3, desc:'Reduces resale of your profile by aggregators (coverage varies by region).'}
+  ];
+
+  /* ===================== STATE ===================== */
+
+  var state = {
+    factsOnly:false,
+    active:{},
+    actions:{}
+  };
+  SERVICES.forEach(function(s){ state.active[s.id] = true; });
+  PROTECTIVE_ACTIONS.forEach(function(a){ state.actions[a.key] = false; });
+
+  function activeServices(){ return SERVICES.filter(function(s){ return state.active[s.id]; }); }
+
+  function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+  function round(n){ return Math.round(n); }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  /* ===================== DERIVED METRICS ===================== */
+
+  function computeMetrics(){
+    var active = activeServices();
+    var n = active.length;
+
+    var typeCount = {};
+    DATA_TYPES.forEach(function(d){ typeCount[d.key] = 0; });
+    active.forEach(function(s){ s.types.forEach(function(t){ typeCount[t]++; }); });
+
+    var collectedTypes = DATA_TYPES.filter(function(d){ return typeCount[d.key] > 0; });
+    var coverageRatio = DATA_TYPES.length ? collectedTypes.length / DATA_TYPES.length : 0;
+
+    var volumeRatio = Math.min(1, n / 20);
+
+    var sensitivitySum = 0, sensitivityCount = 0;
+    active.forEach(function(s){
+      s.types.forEach(function(t){ sensitivitySum += DT_BY_KEY[t].weight; sensitivityCount++; });
+    });
+    var avgSensitivity = sensitivityCount ? (sensitivitySum / sensitivityCount) / 5 : 0;
+
+    var footprintRaw = round(coverageRatio*35 + volumeRatio*30 + avgSensitivity*35);
+    footprintRaw = clamp(footprintRaw, 0, 100);
+
+    var actionsChecked = PROTECTIVE_ACTIONS.filter(function(a){ return state.actions[a.key]; });
+    var footprintDeltaSum = actionsChecked.reduce(function(acc,a){ return acc + a.footprintDelta; }, 0);
+    var pointsSum = actionsChecked.reduce(function(acc,a){ return acc + a.points; }, 0);
+
+    var footprint = clamp(footprintRaw + footprintDeltaSum, 0, 100);
+
+    var privacyBase = clamp(round(100 - footprintRaw*0.7), 0, 100);
+    var privacy = clamp(privacyBase + pointsSum, 0, 100);
+
+    // company shares / exposure
+    var parentMap = {};
+    SERVICES.forEach(function(s){
+      if(!parentMap[s.parent]) parentMap[s.parent] = {total:0, active:0, activeSensitivity:0, ids:[]};
+      parentMap[s.parent].total++;
+      parentMap[s.parent].ids.push(s.id);
+    });
+    active.forEach(function(s){
+      var sens = s.types.reduce(function(acc,t){ return acc + DT_BY_KEY[t].weight; }, 0);
+      parentMap[s.parent].active++;
+      parentMap[s.parent].activeSensitivity += sens;
+    });
+    var parents = Object.keys(parentMap);
+    var totalActiveAcrossParents = active.length || 1;
+    var hhi = 0;
+    parents.forEach(function(p){
+      var share = parentMap[p].active / totalActiveAcrossParents;
+      hhi += share*share;
+    });
+    var concentration = round(hhi*100);
+
+    // tracking surface
+    var trackingSurface = collectedTypes.length;
+
+    // radar values
+    var radarValues = RADAR_AXES.map(function(axis){
+      var rawMax = 0, raw = 0;
+      SERVICES.forEach(function(s){
+        var contrib = s.types.reduce(function(acc,t){ return axis.types.indexOf(t)>-1 ? acc + DT_BY_KEY[t].weight : acc; }, 0);
+        rawMax += contrib;
+      });
+      active.forEach(function(s){
+        var contrib = s.types.reduce(function(acc,t){ return axis.types.indexOf(t)>-1 ? acc + DT_BY_KEY[t].weight : acc; }, 0);
+        raw += contrib;
+      });
+      var val = rawMax > 0 ? clamp(round((raw/rawMax)*100), 0, 100) : 0;
+      return val;
+    });
+
+    // asset values
+    var assetScores = DATA_TYPES.map(function(d){
+      var score = active.reduce(function(acc,s){ return s.types.indexOf(d.key)>-1 ? acc + d.weight : acc; }, 0);
+      return {key:d.key, label:d.label, score:score};
+    }).filter(function(a){ return a.score > 0; }).sort(function(a,b){ return b.score - a.score; });
+
+    return {
+      n:n, typeCount:typeCount, collectedTypes:collectedTypes, coverageRatio:coverageRatio,
+      footprintRaw:footprintRaw, footprint:footprint, privacy:privacy,
+      parentMap:parentMap, parents:parents, concentration:concentration,
+      trackingSurface:trackingSurface, radarValues:radarValues, assetScores:assetScores,
+      actionsChecked:actionsChecked, pointsSum:pointsSum
+    };
+  }
+
+  /* ===================== LEGENDS ===================== */
+
+  function footprintBracket(score){
+    if(score<=30) return {label:'Minimal', emoji:'🟢', color:'var(--green)'};
+    if(score<=60) return {label:'Moderate', emoji:'🟡', color:'var(--yellow)'};
+    if(score<=80) return {label:'Significant', emoji:'🟠', color:'var(--orange)'};
+    return {label:'Extensive', emoji:'🔴', color:'var(--red)'};
+  }
+  function privacyBracket(score){
+    if(score<=30) return {label:'Weak', emoji:'🔴', color:'var(--red)'};
+    if(score<=60) return {label:'Fair', emoji:'🟠', color:'var(--orange)'};
+    if(score<=80) return {label:'Good', emoji:'🟡', color:'var(--yellow)'};
+    return {label:'Strong', emoji:'🟢', color:'var(--green)'};
+  }
+
+  /* ===================== SVG HELPERS ===================== */
+
+  function gaugeSvg(score, color, id){
+    var r = 64, cx = 80, cy = 80;
+    var circ = 2 * Math.PI * r;
+    var offset = circ * (1 - score/100);
+    return ''+
+    '<svg viewBox="0 0 160 160" aria-hidden="true">'+
+      '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="var(--track)" stroke-width="14"></circle>'+
+      '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="14" '+
+        'stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" '+
+        'transform="rotate(-90 '+cx+' '+cy+')" style="transition:stroke-dashoffset .4s ease;"></circle>'+
+    '</svg>';
+  }
+
+  function radarSvg(values){
+    var cx=160, cy=160, maxR=120;
+    var n = RADAR_AXES.length;
+    function pt(i, r){
+      var angle = (-90 + i*(360/n)) * Math.PI/180;
+      return {x: cx + r*Math.cos(angle), y: cy + r*Math.sin(angle)};
+    }
+    var rings = [0.25,0.5,0.75,1].map(function(frac){
+      var pts = [];
+      for(var i=0;i<n;i++){ var p = pt(i, maxR*frac); pts.push(p.x.toFixed(1)+','+p.y.toFixed(1)); }
+      return '<polygon points="'+pts.join(' ')+'" fill="none" stroke="var(--border)" stroke-width="1"></polygon>';
+    }).join('');
+    var axisLines = '';
+    var labels = '';
+    for(var i=0;i<n;i++){
+      var outer = pt(i, maxR);
+      axisLines += '<line x1="'+cx+'" y1="'+cy+'" x2="'+outer.x.toFixed(1)+'" y2="'+outer.y.toFixed(1)+'" stroke="var(--border)" stroke-width="1"></line>';
+      var lp = pt(i, maxR*1.22);
+      labels += '<text x="'+lp.x.toFixed(1)+'" y="'+lp.y.toFixed(1)+'" font-size="11" fill="var(--text-secondary)" text-anchor="middle" dominant-baseline="middle">'+esc(RADAR_AXES[i].label)+'</text>';
+    }
+    var dataPts = [];
+    var dots = '';
+    for(var j=0;j<n;j++){
+      var v = values[j]||0;
+      var p = pt(j, maxR*(v/100));
+      dataPts.push(p.x.toFixed(1)+','+p.y.toFixed(1));
+      dots += '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5" fill="var(--accent)"></circle>';
+    }
+    var dataPoly = '<polygon points="'+dataPts.join(' ')+'" fill="var(--accent)" fill-opacity="0.22" stroke="var(--accent)" stroke-width="2"></polygon>';
+    return '<svg class="radar-svg" viewBox="0 0 320 320" role="img" aria-label="Risk radar chart">'+rings+axisLines+dataPoly+dots+labels+'</svg>';
+  }
+
+  function heatColor(intensity){
+    // intensity 0..1 -> light to accent
+    var alpha = 0.08 + intensity*0.72;
+    return 'rgba(79,93,224,'+alpha.toFixed(2)+')';
+  }
+
+  /* ===================== RENDERERS ===================== */
+
+  function renderScoreCard(containerId, score, bracketFn, title, factorLines){
+    var b = bracketFn(score);
+    var el = document.getElementById(containerId);
+    el.innerHTML =
+      '<div class="gauge-wrap">'+
+        gaugeSvg(score, b.color, containerId)+
+        '<div class="gauge-center"><div class="num" style="color:'+b.color+'">'+score+'</div><div class="max">/ 100</div></div>'+
+      '</div>'+
+      '<div class="score-details">'+
+        '<p class="eyebrow">'+esc(title)+' <span class="badge badge-estimate" style="margin-left:6px;">ESTIMATE</span></p>'+
+        '<div class="score-bracket" style="color:'+b.color+'">'+b.emoji+' '+b.label+'</div>'+
+        '<p>'+factorLines.desc+'</p>'+
+        '<ul class="factor-list">'+
+          factorLines.rows.map(function(r){ return '<li><span>'+esc(r[0])+'</span><span>'+esc(r[1])+'</span></li>'; }).join('')+
+        '</ul>'+
+      '</div>';
+  }
+
+  function renderHeatmap(m){
+    var el = document.getElementById('heatmapSection');
+    var header =
+      '<div class="card-head"><div><p class="eyebrow">Exposure Heatmap <span class="badge badge-estimate">ESTIMATE</span></p>'+
+      '<h2>Category × Data Type intensity</h2><p class="desc">Each cell estimates how many active services in a category collect a given data type. Darker = more estimated overlap.</p></div></div>';
+
+    if(state.factsOnly){
+      el.innerHTML = header + '<div class="placeholder-note">Not enough information provided. (Heatmap intensity is an Estimate — switch to "Facts + Estimates" to view it.)</div>';
+      return;
+    }
+    if(m.n===0){
+      el.innerHTML = header + '<div class="placeholder-note">Not enough information provided. (No active services to analyze.)</div>';
+      return;
+    }
+
+    // build category x datatype counts
+    var grid = {};
+    CATEGORIES.forEach(function(c){ grid[c]={}; DATA_TYPES.forEach(function(d){ grid[c][d.key]=0; }); });
+    activeServices().forEach(function(s){
+      s.types.forEach(function(t){ grid[s.category][t]++; });
+    });
+    var maxCell = 1;
+    CATEGORIES.forEach(function(c){ DATA_TYPES.forEach(function(d){ maxCell = Math.max(maxCell, grid[c][d.key]); }); });
+
+    var cols = DATA_TYPES.length;
+    var gridStyle = 'grid-template-columns:170px '+Array(cols).fill('1fr').join(' ')+';';
+    var html = '<div class="heatmap-scroll"><div class="heatmap-grid" style="'+gridStyle+'">';
+    html += '<div class="hm-corner"></div>';
+    DATA_TYPES.forEach(function(d){ html += '<div class="hm-col-label" title="'+esc(d.label)+'">'+esc(d.short)+'</div>'; });
+    CATEGORIES.forEach(function(c){
+      html += '<div class="hm-row-label">'+esc(c)+'</div>';
+      DATA_TYPES.forEach(function(d){
+        var v = grid[c][d.key];
+        var intensity = v/maxCell;
+        html += '<div class="hm-cell" title="'+esc(c)+' × '+esc(d.label)+': '+v+' active service(s)" style="background:'+(v>0?heatColor(intensity):'transparent')+';">'+(v>0?v:'')+'</div>';
+      });
+    });
+    html += '</div></div>';
+    el.innerHTML = header + html;
+  }
+
+  function renderRanking(m){
+    var el = document.getElementById('rankingSection');
+    var header =
+      '<div class="card-head"><div><p class="eyebrow">Company Exposure Ranking <span class="badge badge-estimate">ESTIMATE</span></p>'+
+      '<h2>Parent companies ranked by estimated exposure</h2><p class="desc">Ranked by active service count and combined data-sensitivity. Uncheck a company to simulate dropping all of its services.</p></div></div>';
+
+    if(state.factsOnly){
+      el.innerHTML = header + '<div class="placeholder-note">Not enough information provided. (Parent-company mapping is an Estimate — switch to "Facts + Estimates" to view it.)</div>';
+      return;
+    }
+
+    var rows = m.parents.map(function(p){
+      var d = m.parentMap[p];
+      var exposure = d.active*10 + d.activeSensitivity;
+      return {name:p, active:d.active, total:d.total, exposure:exposure};
+    }).sort(function(a,b){ return b.exposure - a.exposure; });
+
+    var maxExposure = Math.max.apply(null, rows.map(function(r){ return r.exposure; }).concat([1]));
+
+    if(rows.every(function(r){ return r.active===0; })){
+      el.innerHTML = header + '<div class="placeholder-note">Not enough information provided. (No active services to rank.)</div>';
+      return;
+    }
+
+    var html = rows.map(function(r){
+      var checked = r.active>0 ? (r.active===r.total ? 'checked' : '') : '';
+      var indeterminate = (r.active>0 && r.active<r.total);
+      var pct = clamp(round((r.exposure/maxExposure)*100),0,100);
+      return '<div class="rank-row">'+
+        '<input type="checkbox" class="rank-check parent-toggle" data-parent="'+esc(r.name)+'" '+checked+' '+(indeterminate?'data-indeterminate="1"':'')+' aria-label="Include all services from '+esc(r.name)+'">'+
+        '<div class="rank-name">'+esc(r.name)+'</div>'+
+        '<div class="rank-bar-wrap"><div class="rank-bar-track"><div class="rank-bar-fill" style="width:'+pct+'%;"></div></div></div>'+
+        '<div class="rank-meta">'+r.active+' / '+r.total+' active</div>'+
+      '</div>';
+    }).join('');
+    el.innerHTML = header + html;
+
+    rows.forEach(function(r){
+      if(r.active>0 && r.active<r.total){
+        var node = el.querySelector('.parent-toggle[data-parent="'+cssEscape(r.name)+'"]');
+        if(node) node.indeterminate = true;
+      }
+    });
+  }
+
+  function cssEscape(s){ return s.replace(/(["\\])/g,'\\$1'); }
+
+  function renderMatrix(m){
+    var el = document.getElementById('matrixSection');
+    var header =
+      '<div class="card-head"><div><p class="eyebrow">Data Collection Matrix <span class="badge badge-fact" style="margin-right:4px;">FACT: service &amp; category</span><span class="badge badge-estimate">ESTIMATE: parent &amp; data types</span></p>'+
+      '<h2>Service-level breakdown</h2><p class="desc">Toggle "Active" to simulate stopping use of a service. Checkmarks indicate an estimated data type collected.</p></div></div>';
+
+    var factsOnly = state.factsOnly;
+    var cols = factsOnly ? [] : DATA_TYPES;
+
+    var theadCols = '<th class="name-cell">Service</th><th class="name-cell">Category</th>'+
+      (factsOnly ? '' : '<th class="name-cell">Parent</th>') +
+      '<th>Active</th>'+
+      cols.map(function(d){ return '<th title="'+esc(d.label)+'">'+esc(d.short)+'</th>'; }).join('');
+
+    var rows = SERVICES.map(function(s){
+      var isActive = state.active[s.id];
+      var tds = '<td class="name-cell">'+esc(s.name)+'</td>'+
+        '<td class="name-cell">'+esc(s.category)+'</td>'+
+        (factsOnly ? '' : '<td class="name-cell">'+esc(s.parent)+' <span class="parent-tag">(est.)</span></td>') +
+        '<td><input type="checkbox" class="svc-toggle" data-id="'+s.id+'" '+(isActive?'checked':'')+' aria-label="Active: '+esc(s.name)+'"></td>' +
+        cols.map(function(d){ return '<td>'+(s.types.indexOf(d.key)>-1 ? '<span class="tick">✓</span>' : '') + '</td>'; }).join('');
+      return '<tr class="'+(isActive?'':'inactive')+'">'+tds+'</tr>';
+    }).join('');
+
+    var note = factsOnly ? '<p class="desc" style="margin-top:10px;">Data-type and parent-company columns are hidden in Facts-only mode.</p>' : '';
+
+    el.innerHTML = header +
+      '<div class="matrix-scroll"><table class="matrix"><thead><tr>'+theadCols+'</tr></thead><tbody>'+rows+'</tbody></table></div>' + note;
+  }
+
+  function renderRadar(m){
+    var el = document.getElementById('radarSection');
+    var header = '<div class="card-head"><div><p class="eyebrow">Risk Radar <span class="badge badge-estimate">ESTIMATE</span></p>'+
+      '<h2>Exposure by risk dimension</h2><p class="desc">Each axis is scaled 0–100 relative to the full sample dataset\'s maximum possible exposure on that dimension.</p></div></div>';
+
+    if(state.factsOnly){
+      el.innerHTML = header + '<div class="placeholder-note">Not enough information provided. (Risk Radar is an Estimate — switch to "Facts + Estimates" to view it.)</div>';
+      return;
+    }
+    if(m.n===0){
+      el.innerHTML = header + '<div class="placeholder-note">Not enough information provided. (No active services to analyze.)</div>';
+      return;
+    }
+
+    var legendRows = RADAR_AXES.map(function(axis,i){
+      return '<div class="radar-legend-row"><span>'+esc(axis.label)+'</span><span>'+m.radarValues[i]+'/100</span></div>';
+    }).join('');
+
+    el.innerHTML = header +
+      '<div class="radar-wrap">'+radarSvg(m.radarValues)+'<div class="radar-legend">'+legendRows+'</div></div>';
+  }
+
+  function renderTwin(m){
+    var el = document.getElementById('twinSection');
+    var header = '<div class="card-head"><div><p class="eyebrow">Digital Twin Profile <span class="badge badge-estimate">ESTIMATE</span></p>'+
+      '<h2>What active services may suggest</h2><p class="desc">Hedged, pattern-level inferences only — never treated as confirmed facts about any individual.</p></div></div>';
+
+    if(state.factsOnly){
+      el.innerHTML = header + '<div class="placeholder-note">Not enough information provided. (Profile inferences are Estimates — switch to "Facts + Estimates" to view them.)</div>';
+      return;
+    }
+
+    var active = activeServices();
+    if(active.length===0){
+      el.innerHTML = header + '<div class="placeholder-note">Not enough information provided. (No active services to infer from.)</div>';
+      return;
+    }
+
+    var byCat = {};
+    active.forEach(function(s){ byCat[s.category] = (byCat[s.category]||0)+1; });
+    var byParent = {};
+    active.forEach(function(s){ byParent[s.parent] = (byParent[s.parent]||0)+1; });
+    var hasAndroid = active.some(function(s){ return s.id==='android'; });
+    var hasIOS = active.some(function(s){ return s.id==='iphone'; });
+
+    var bullets = [];
+    if(hasAndroid && !hasIOS) bullets.push('Primary mobile platform may be Android-leaning, based on OS-level service usage.');
+    else if(hasIOS && !hasAndroid) bullets.push('Primary mobile platform may be iOS-leaning, based on OS-level service usage.');
+    else if(hasAndroid && hasIOS) bullets.push('Device usage may span both Android and iOS, possibly across multiple devices.');
+
+    if((byCat['Social Media']||0) >= 2) bullets.push('Maintains an active presence across multiple social platforms, which may correlate with a broad, publicly visible social graph.');
+    if(active.some(function(s){ return s.id==='amazon'; })) bullets.push('Likely engages in regular online shopping; purchase and payment patterns may be partly inferable from order history.');
+    if(active.some(function(s){ return s.id==='alexa'; })) bullets.push('Possible use of a voice assistant or smart speaker at home, which may capture short ambient audio clips.');
+    if(active.some(function(s){ return s.id==='fitbit'; })) bullets.push('Health and biometric signals (e.g., activity or heart-rate patterns) may be tracked through a connected wearable.');
+    if((byCat['Streaming & Media']||0) >= 2) bullets.push('Entertainment preferences (genres, viewing or listening habits) are likely inferable from streaming activity.');
+    if((byCat['Finance']||0) >= 2) bullets.push('Financial behavior (spending categories, payment patterns) may be partially reconstructable from linked payment services.');
+
+    var parentCount = Object.keys(byParent).length;
+    var maxShare = Math.max.apply(null, Object.keys(byParent).map(function(p){ return byParent[p]/active.length; }));
+    if(parentCount >= 6) bullets.push('Activity is spread across several companies rather than one ecosystem, which may limit how complete a single company\'s view can be.');
+    else if(maxShare >= 0.35) bullets.push('A large share of activity is concentrated in one corporate ecosystem (see Company Exposure Ranking), which may allow a fuller cross-service profile by that company.');
+
+    if(bullets.length===0) bullets.push('No strong pattern-level inferences are supported by the currently active services.');
+
+    el.innerHTML = header + '<ul class="twin-list">' +
+      bullets.map(function(b){ return '<li><span class="twin-bullet">●</span><span>'+esc(b)+' <span class="badge badge-estimate">ESTIMATE</span></span></li>'; }).join('') +
+      '</ul>';
+  }
+
+  function renderAssets(m){
+    var el = document.getElementById('assetsSection');
+    var header = '<div class="card-head"><div><p class="eyebrow">Most Valuable Data Assets <span class="badge badge-estimate">ESTIMATE</span></p>'+
+      '<h2>Ranked by estimated monetization value</h2><p class="desc">Combines how often a data type is collected by active services with its relative sensitivity weight.</p></div></div>';
+
+    if(state.factsOnly){
+      el.innerHTML = header + '<div class="placeholder-note">Not enough information provided. (Valuation ranking is an Estimate — switch to "Facts + Estimates" to view it.)</div>';
+      return;
+    }
+    if(m.assetScores.length===0){
+      el.innerHTML = header + '<div class="placeholder-note">Not enough information provided. (No active services to analyze.)</div>';
+      return;
+    }
+    var top = m.assetScores.slice(0,5);
+    var maxScore = top[0].score;
+    var rows = top.map(function(a,i){
+      var pct = clamp(round((a.score/maxScore)*100),0,100);
+      return '<div class="asset-row">'+
+        '<div class="asset-rank">#'+(i+1)+'</div>'+
+        '<div class="asset-main">'+
+          '<div class="asset-title">'+esc(a.label)+' <span class="badge badge-estimate">ESTIMATE</span></div>'+
+          '<div class="asset-bar-track"><div class="asset-bar-fill" style="width:'+pct+'%;"></div></div>'+
+          '<div class="asset-desc">'+esc(ASSET_DESC[a.key]||'')+'</div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+    el.innerHTML = header + rows;
+  }
+
+  function renderPlan(m){
+    var el = document.getElementById('planSection');
+    var header = '<div class="card-head"><div><p class="eyebrow">Privacy Improvement Plan <span class="badge badge-estimate">ESTIMATE</span></p>'+
+      '<h2>Recommended actions</h2><p class="desc">General best-practice suggestions, not facts about this dataset. Check matching items in the Simulator below to model their effect.</p></div></div>';
+
+    var rows = PROTECTIVE_ACTIONS.map(function(a){
+      var done = state.actions[a.key];
+      return '<div class="plan-row">'+
+        '<div class="plan-status">'+(done?'✅':'⬜')+'</div>'+
+        '<div class="plan-main"><div class="plan-title">'+esc(a.label)+'</div><div class="plan-desc">'+esc(a.desc)+'</div></div>'+
+        '<div class="plan-impact">+'+a.points+' Privacy (est.)'+(a.footprintDelta? ', '+a.footprintDelta+' Footprint':'')+'</div>'+
+      '</div>';
+    }).join('');
+
+    el.innerHTML = header + rows;
+  }
+
+  function renderSimulator(m){
+    var el = document.getElementById('simulatorSection');
+    var header = '<div class="card-head"><div><p class="eyebrow">Privacy Improvement Simulator <span class="badge badge-neutral">INTERACTIVE</span></p>'+
+      '<h2>Model the effect of changes</h2><p class="desc">Toggle protective actions, or use the quick actions below to deactivate every service from a company. Everything above recalculates live.</p></div></div>';
+
+    var actionRows = PROTECTIVE_ACTIONS.map(function(a){
+      return '<div class="sim-action">'+
+        '<input type="checkbox" class="action-toggle" id="act-'+a.key+'" data-key="'+a.key+'" '+(state.actions[a.key]?'checked':'')+'>'+
+        '<label for="act-'+a.key+'">'+esc(a.label)+'<span class="sub">'+esc(a.desc)+'</span></label>'+
+      '</div>';
+    }).join('');
+
+    var quick = Object.keys(m.parentMap).map(function(p){
+      return '<button class="btn btn-sm quick-deactivate" data-parent="'+esc(p)+'" type="button">Deactivate all '+esc(p)+'</button>';
+    }).join('');
+
+    var readout = '<div class="sim-readout">'+
+      '<span><b>'+m.n+'</b> / '+SERVICES.length+' services active</span>'+
+      '<span><b>'+m.actionsChecked.length+'</b> / '+PROTECTIVE_ACTIONS.length+' protective actions enabled</span>'+
+      '<span>Footprint Δ: <b>'+(m.footprint-m.footprintRaw>=0?'+':'')+(m.footprint-m.footprintRaw)+'</b></span>'+
+      '<span>Privacy bonus: <b>+'+m.pointsSum+'</b></span>'+
+    '</div>';
+
+    el.innerHTML = header +
+      '<div class="sim-grid">'+
+        '<div><h2 style="font-size:.92rem;margin-bottom:6px;">Protective actions</h2>'+actionRows+'</div>'+
+        '<div><h2 style="font-size:.92rem;margin-bottom:6px;">Quick service toggles</h2><p class="desc">Deactivate or reactivate entire ecosystems at once.</p>'+
+          '<div class="quick-actions">'+quick+'<button class="btn btn-sm" id="reactivateAllBtn" type="button">Reactivate all services</button></div>'+
+        '</div>'+
+      '</div>'+
+      readout;
+  }
+
+  function renderVerdict(m){
+    var el = document.getElementById('verdictSection');
+    var header = '<div class="card-head"><div><p class="eyebrow">Final Verdict <span class="badge badge-estimate">ESTIMATE</span></p><h2>Summary</h2></div></div>';
+
+    if(state.factsOnly){
+      el.innerHTML = header + '<div class="placeholder-note">Not enough information provided. (The verdict depends on Estimated scores — switch to "Facts + Estimates" to view it.)</div>';
+      return;
+    }
+
+    var fb = footprintBracket(m.footprint), pb = privacyBracket(m.privacy);
+    var msg = 'Under the current simulation, the estimated Digital Footprint is '+fb.label.toLowerCase()+' ('+m.footprint+'/100) '+fb.emoji+' while the estimated Privacy Score is '+pb.label.toLowerCase()+' ('+m.privacy+'/100) '+pb.emoji+'. ';
+
+    if((fb.label==='Extensive'||fb.label==='Significant') && (pb.label==='Weak'||pb.label==='Fair')){
+      msg += 'This combination suggests comparatively high estimated exposure alongside limited protective measures — the Privacy Improvement Plan above is a reasonable place to start.';
+    } else if((fb.label==='Minimal'||fb.label==='Moderate') && (pb.label==='Strong'||pb.label==='Good')){
+      msg += 'This is a comparatively low-exposure, better-protected profile relative to the full sample dataset.';
+    } else {
+      msg += 'There is meaningful room to reduce exposure and strengthen protective habits — use the Simulator to explore the effect of specific changes.';
+    }
+    msg += ' This verdict is a deterministic, illustrative Estimate generated from the sample dataset and current toggle settings — it is not a certainty claim about any real individual.';
+
+    el.innerHTML = header +
+      '<p class="verdict-text">'+esc(msg).replace('Estimate.','Estimate.')+'</p>'+
+      '<div class="verdict-chips">'+
+        '<span class="verdict-chip" style="color:'+fb.color+'">'+fb.emoji+' Footprint: '+m.footprint+'</span>'+
+        '<span class="verdict-chip" style="color:'+pb.color+'">'+pb.emoji+' Privacy: '+m.privacy+'</span>'+
+        '<span class="verdict-chip">Active services: '+m.n+' / '+SERVICES.length+'</span>'+
+      '</div>'+
+      '<p class="verdict-footnote">Generated deterministically from fixed rules applied to the sample dataset and current simulator state.</p>';
+  }
+
+  function renderTotals(m){
+    var el = document.getElementById('totalsSection');
+    function card(eyebrow, badge, num, sub){
+      return '<div class="stat-card"><p class="eyebrow">'+esc(eyebrow)+' <span class="badge '+(badge==='FACT'?'badge-fact':'badge-estimate')+'">'+badge+'</span></p>'+
+        '<div class="stat-num">'+num+'</div><div class="stat-sub">'+esc(sub)+'</div></div>';
+    }
+    var html = card('Total Services Used','FACT', SERVICES.length, m.n+' currently active in simulation');
+
+    if(state.factsOnly){
+      html += card('Number of Parent Companies','ESTIMATE', '—', 'Not enough information provided.');
+      html += card('Ecosystem Concentration Score','ESTIMATE', '—', 'Not enough information provided.');
+      html += card('Estimated Tracking Surface','ESTIMATE', '—', 'Not enough information provided.');
+    } else {
+      html += card('Number of Parent Companies','ESTIMATE', m.parents.length, 'distinct companies across the dataset');
+      html += card('Ecosystem Concentration Score','ESTIMATE', m.concentration, 'HHI-style, 0 = dispersed, 100 = single company (active services)');
+      html += card('Estimated Tracking Surface','ESTIMATE', m.trackingSurface+' / '+DATA_TYPES.length, 'data categories actively collected (est.)');
+    }
+    el.innerHTML = html;
+  }
+
+  /* ===================== MASTER RENDER ===================== */
+
+  function render(){
+    var m = computeMetrics();
+
+    renderScoreCard('footprintCard', m.footprint, footprintBracket, 'Digital Footprint Score', {
+      desc:'Reflects how broad and sensitive your estimated active digital presence is across the sample dataset.',
+      rows:[
+        ['Active services', m.n+' / '+SERVICES.length],
+        ['Data categories collected', m.trackingSurface+' / '+DATA_TYPES.length],
+        ['Simulator footprint adjustment', (m.footprint-m.footprintRaw>=0?'+':'')+(m.footprint-m.footprintRaw)]
+      ]
+    });
+
+    renderScoreCard('privacyCard', m.privacy, privacyBracket, 'Privacy Score', {
+      desc:'Reflects estimated protective posture: inverse of exposure, boosted by protective actions enabled in the Simulator.',
+      rows:[
+        ['Protective actions enabled', m.actionsChecked.length+' / '+PROTECTIVE_ACTIONS.length],
+        ['Privacy bonus from actions', '+'+m.pointsSum],
+        ['Baseline (pre-action) exposure', m.footprintRaw+' / 100']
+      ]
+    });
+
+    renderHeatmap(m);
+    renderRanking(m);
+    renderMatrix(m);
+    renderRadar(m);
+    renderTwin(m);
+    renderAssets(m);
+    renderPlan(m);
+    renderSimulator(m);
+    renderVerdict(m);
+    renderTotals(m);
+  }
+
+  /* ===================== EVENTS ===================== */
+
+  var app = document.getElementById('app');
+
+  app.addEventListener('change', function(e){
+    var t = e.target;
+    if(t.classList.contains('svc-toggle')){
+      state.active[t.getAttribute('data-id')] = t.checked;
+      render();
+    } else if(t.classList.contains('action-toggle')){
+      state.actions[t.getAttribute('data-key')] = t.checked;
+      render();
+    } else if(t.classList.contains('parent-toggle')){
+      var parent = t.getAttribute('data-parent');
+      var newVal = t.checked;
+      SERVICES.forEach(function(s){ if(s.parent===parent) state.active[s.id] = newVal; });
+      render();
+    }
+  });
+
+  app.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.id==='resetBtn'){
+      SERVICES.forEach(function(s){ state.active[s.id] = true; });
+      PROTECTIVE_ACTIONS.forEach(function(a){ state.actions[a.key] = false; });
+      render();
+    } else if(t.id==='viewAllBtn'){
+      state.factsOnly = false;
+      t.classList.add('active');
+      document.getElementById('viewFactsBtn').classList.remove('active');
+      render();
+    } else if(t.id==='viewFactsBtn'){
+      state.factsOnly = true;
+      t.classList.add('active');
+      document.getElementById('viewAllBtn').classList.remove('active');
+      render();
+    } else if(t.classList.contains('quick-deactivate')){
+      var parent = t.getAttribute('data-parent');
+      SERVICES.forEach(function(s){ if(s.parent===parent) state.active[s.id] = false; });
+      render();
+    } else if(t.id==='reactivateAllBtn'){
+      SERVICES.forEach(function(s){ state.active[s.id] = true; });
+      render();
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
